@@ -54,10 +54,10 @@ contract Mayor {
     mapping(address => bool) opened_envelopes;
 
     //yay/nay counters
-    uint nayVote = 0;
-    uint yayVote = 0;
+    //uint nayVote = 0;
+    //uint yayVote = 0;
 
-    //*******************************************
+    //***********************************************
 
     Conditions voting_condition;
 
@@ -67,6 +67,11 @@ contract Mayor {
     // Refund phase variables
     mapping(address => Refund) souls;
     address payable[] voters;
+
+    //***********************************************
+    // the public keyword has been removed from the constructor
+    // since it generates a warning message
+    //***********************************************
 
     /// @notice The constructor only initializes internal variables
     /// @param _candidate (address) The address of the mayor candidate
@@ -136,11 +141,9 @@ contract Mayor {
 
         // increment votes counters and souls counter
         if (_doblon){
-            yayVote ++;
-            yaySoul = yaySoul + msg.value;
+            yaySoul ++;
         }else{
-            nayVote ++;
-            naySoul = naySoul + msg.value;
+            naySoul ++;
         }
             
         //emit event
@@ -159,34 +162,41 @@ contract Mayor {
             // emit the Sayonara() event if the candidate is NOT confirmed as mayor 
 
         // *****************************************************
-        if (yayVote > nayVote) {
+        if (yaySoul > naySoul) {
             // CONFIRM CANDIDATE
             //emit event
             emit NewMayor(candidate);
-            //transfer money to candidate
-            candidate.transfer(yaySoul);
             //go through all the voters and refund ones who lose
             uint n_voters = voters.length;
+            uint candidate_contribution = 0;
             for (uint i=0; i<n_voters; i++){
                 //if doblon is False 
                 if (!(souls[voters[i]].doblon)){
                     voters[i].transfer(souls[voters[i]].soul);
+                }else{
+                    //sum all the souls provided
+                    candidate_contribution = candidate_contribution + souls[voters[i]].soul;
                 }
-            }
+            }            
+            //transfer money to candidate
+            candidate.transfer(candidate_contribution);
         }else{
             //KICK OFF CANDIDATE
             //emit sayonara event
             emit Sayonara(escrow);
-            //transferm money to escrow
-            escrow.transfer(yaySoul);
             //go through all the voters and refund ones who lose
             uint n_voters = voters.length;
+            uint escrow_contribution = 0;
             for (uint i=0; i<n_voters; i++){
                 //if doblon is True 
                 if (souls[voters[i]].doblon){
                     voters[i].transfer(souls[voters[i]].soul);
+                }else{
+                    escrow_contribution = escrow_contribution + souls[voters[i]].soul;
                 }
             }
+            //transferm money to escrow
+            escrow.transfer(yaySoul);
         }       
 
         // *****************************************************       
