@@ -73,3 +73,8 @@ the mayor has been confirmed, the new mayor receives, to their address, the soul
 associated with the yay votes as a contribution to the expenses for the next 50 years;
 otherwise, the soul associated with the nay votes is assigned to the “escrow account” that
 was declared during the creation of the contract.
+
+## How to compile
+```
+truffle compile
+```
