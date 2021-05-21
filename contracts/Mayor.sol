@@ -196,7 +196,7 @@ contract Mayor {
                 }
             }
             //transferm money to escrow
-            escrow.transfer(yaySoul);
+            escrow.transfer(escrow_contribution);
         }       
 
         // *****************************************************       
