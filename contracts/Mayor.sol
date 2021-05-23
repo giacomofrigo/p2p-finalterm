@@ -141,9 +141,9 @@ contract Mayor {
 
         // increment votes counters and souls counter
         if (_doblon){
-            yaySoul ++;
+            yaySoul = yaySoul + msg.value;
         }else{
-            naySoul ++;
+            naySoul = naySoul + msg.value;
         }
             
         //emit event
