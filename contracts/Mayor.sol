@@ -53,10 +53,6 @@ contract Mayor {
     // keeping track of who already opened his envelope
     mapping(address => bool) opened_envelopes;
 
-    //yay/nay counters
-    //uint nayVote = 0;
-    //uint yayVote = 0;
-
     //***********************************************
 
     Conditions voting_condition;
@@ -168,35 +164,28 @@ contract Mayor {
             emit NewMayor(candidate);
             //go through all the voters and refund ones who lose
             uint n_voters = voters.length;
-            uint candidate_contribution = 0;
             for (uint i=0; i<n_voters; i++){
                 //if doblon is False 
                 if (!(souls[voters[i]].doblon)){
                     voters[i].transfer(souls[voters[i]].soul);
-                }else{
-                    //sum all the souls provided
-                    candidate_contribution = candidate_contribution + souls[voters[i]].soul;
                 }
             }            
             //transfer money to candidate
-            candidate.transfer(candidate_contribution);
+            candidate.transfer(yaySoul);
         }else{
             //KICK OFF CANDIDATE
             //emit sayonara event
             emit Sayonara(escrow);
             //go through all the voters and refund ones who lose
             uint n_voters = voters.length;
-            uint escrow_contribution = 0;
             for (uint i=0; i<n_voters; i++){
                 //if doblon is True 
                 if (souls[voters[i]].doblon){
                     voters[i].transfer(souls[voters[i]].soul);
-                }else{
-                    escrow_contribution = escrow_contribution + souls[voters[i]].soul;
                 }
             }
             //transferm money to escrow
-            escrow.transfer(escrow_contribution);
+            escrow.transfer(naySoul);
         }       
 
         // *****************************************************       
