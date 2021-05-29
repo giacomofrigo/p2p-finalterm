@@ -49,11 +49,7 @@ contract Mayor {
     
     // Voting phase variables
     mapping(address => bytes32) envelopes;
-    //****************************************
-    // keeping track of who already opened his envelope
-    mapping(address => bool) opened_envelopes;
 
-    //***********************************************
 
     Conditions voting_condition;
 
@@ -107,7 +103,7 @@ contract Mayor {
         require(envelopes[msg.sender] != 0x0, "The sender has not casted any votes");
         // ******************************************************
         // check that the envelope has not opened yet
-        require(opened_envelopes[msg.sender] == false, "The sender has already opened his envelope");
+        require(souls[msg.sender].soul == 0x0, "The sender has already opened this envelope");
         // ****************************************************
         
         bytes32 _casted_envelope = envelopes[msg.sender];
@@ -122,8 +118,6 @@ contract Mayor {
         // ...
         // ***************************************************
         
-        // set the opened envelope to true
-        opened_envelopes[msg.sender] = true;
         // increment # of envelopes opened
         voting_condition.envelopes_opened++;
 
