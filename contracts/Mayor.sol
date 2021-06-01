@@ -16,6 +16,7 @@ contract Mayor {
         uint32 quorum;
         uint32 envelopes_casted;
         uint32 envelopes_opened;
+        bool ended;
     }
     
     event NewMayor(address _candidate);
@@ -37,7 +38,10 @@ contract Mayor {
     
     // The outcome of the confirmation can be computed as soon as all the casted envelopes have been opened
     modifier canCheckOutcome() {
-        require(voting_condition.envelopes_opened == voting_condition.quorum, "Cannot check the winner, need to open all the sent envelopes");
+        require(voting_condition.envelopes_opened == voting_condition.quorum , "Cannot check the winner, need to open all the sent envelopes");
+        //***********************************************
+        require(voting_condition.ended == false , "Mayor or Sayonara has already been called");
+        //***********************************************
         _;
     }
     
@@ -72,7 +76,7 @@ contract Mayor {
     constructor(address payable _candidate, address payable _escrow, uint32 _quorum) {
         candidate = _candidate;
         escrow = _escrow;
-        voting_condition = Conditions({quorum: _quorum, envelopes_casted: 0, envelopes_opened: 0});
+        voting_condition = Conditions({quorum: _quorum, envelopes_casted: 0, envelopes_opened: 0, ended: false});
     }
 
 
@@ -152,10 +156,11 @@ contract Mayor {
             // emit the Sayonara() event if the candidate is NOT confirmed as mayor 
 
         // *****************************************************
+
+        voting_condition.ended = true;
+
         if (yaySoul > naySoul) {
             // CONFIRM CANDIDATE
-            //emit event
-            emit NewMayor(candidate);
             //go through all the voters and refund ones who lose
             uint n_voters = voters.length;
             for (uint i=0; i<n_voters; i++){
@@ -166,10 +171,10 @@ contract Mayor {
             }            
             //transfer money to candidate
             candidate.transfer(yaySoul);
+            //emit event
+            emit NewMayor(candidate);
         }else{
             //KICK OFF CANDIDATE
-            //emit sayonara event
-            emit Sayonara(escrow);
             //go through all the voters and refund ones who lose
             uint n_voters = voters.length;
             for (uint i=0; i<n_voters; i++){
@@ -180,6 +185,8 @@ contract Mayor {
             }
             //transferm money to escrow
             escrow.transfer(naySoul);
+            //emit sayonara event
+            emit Sayonara(escrow);
         }       
 
         // *****************************************************       
